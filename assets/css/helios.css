@@ -1,2 +1,2 @@
-.row{display:flex;flex-wrap:nowrap;overflow-x:auto;color:#000}
+.helios{display:flex;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}.helios::-webkit-scrollbar{display:none}.helios>div[class^='col']{flex:0 0 auto;-webkit-transition:all .5s ease-in-out;-moz-transition:all .5s ease-in-out;-ms-transition:all .5s ease-in-out;-o-transition:all .5s ease-in-out;transition:all .5s ease-in-out}.helios>div[class^='col']>div{background-color:#eee;height:100%}
 /*# sourceMappingURL=helios.css.map */
