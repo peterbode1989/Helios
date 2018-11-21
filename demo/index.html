@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Bootstrap grid slider">
+	<title>Helios</title>
+    <link rel="stylesheet" type="text/css" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../assets/css/helios.css">
+    <style>
+        body {
+            padding: 50px 0;
+        }
+
+        div[class^='col'] {
+            background-color: khaki;
+        }
+        div[class^='col'] > div {
+            background: blue;
+            height: 100%;
+        }
+
+
+
+
+        .row > div[class^='col'] {
+            flex: 0 0 auto;
+            -webkit-transition: all 500ms ease-in-out;
+            -moz-transition: all 500ms ease-in-out;
+            -ms-transition: all 500ms ease-in-out;
+            -o-transition: all 500ms ease-in-out;
+            transition: all 500ms ease-in-out;
+        }
+
+        .row {
+            -webkit-overflow-scrolling: touch;
+        }
+        .row::-webkit-scrollbar {
+          display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid">
+        <div class="row slider">
+            <div class="col">
+                <div>wasd</div>
+            </div>
+            <div class="col">
+                <div>wasd</div>
+            </div>
+            <div class="col">
+                <div>wasd<br><br>asd</div>
+            </div>
+            <div class="col">
+                <div>wasd</div>
+            </div>
+            <div class="col">
+                <div>wasd</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="../node_modules/popper.js/dist/umd/popper.min.js"></script>
+	<script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="../assets/js/helios.js"></script>
+
+    <script>
+        $(function() {
+            $('.slider').helios();
+        });
+    </script>
+</body>
+</html>
