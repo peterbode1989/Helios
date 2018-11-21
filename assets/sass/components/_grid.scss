@@ -11,7 +11,7 @@
 
     > div[class^='col'] {
         flex: 0 0 auto;
-        @include transition(.5s);
+        // @include transition(.5s);
 
         > div {
             background-color: $gray;

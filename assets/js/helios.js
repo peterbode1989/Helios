@@ -28,6 +28,7 @@
             _.defaults = {
                 step: 1, // the amount of cols to scroll when moving
                 gutter: 15, // the default space between cols
+                infinite: false,
 
                 dots: false, // Boolean for showing/hiding the dots
                 appendDots: null,
@@ -35,39 +36,79 @@
 
                 arrows: false, // Boolean for showing/hiding the arrows
                 appendArrows: $(element), // Element to appen
-                elPrevArrow: '<button class="helios-prev" aria-label="Previous" type="button">Previous</button>',
-                elNextArrow: '<button class="helios-next" aria-label="Next" type="button">Next</button>',
+                elPrevArrow: '<button class="helios-arrow prev" aria-label="Previous" type="button">Previous</button>',
+                elNextArrow: '<button class="helios-arrow next" aria-label="Next" type="button">Next</button>',
             };
             _.options = $.extend({}, _.defaults, settings);
 
             _.$slider = $(element);
+            _.$children = $(element).children('div');
+            _.$childSize = $(element).children('div').outerWidth();
+            _.currentIndex = 0;
 
             _.init();
         }
         return Helios;
     }());
 
+    Helios.prototype.move = function(_, e) {
+        let dir = $(e.target).attr('data-dir');
+        dir = (dir == '-' ? -_.$childSize : _.$childSize);
+
+        _.$children.each(function() {
+            let dist = parseInt($(this).css('left'));
+
+            $(this).animate({
+                left: parseInt(dist + dir),
+            }, 500, function() {
+                // Animation complete.
+            });
+        });
+    }
+
     Helios.prototype.buildArrows = function() {
         // all code that builds the arrows
         var _ = this;
 
+        if(_.options.arrows === true) {
+            // Apply default classes and events to elements
+            _.$prevArrow = $(_.options.elPrevArrow)
+                .addClass('helios-arrow prev')
+                .attr('data-dir', '+')
+                .on('click', function(e) {
+                    _.move(_, e);
+                });
+
+            _.$nextArrow = $(_.options.elNextArrow)
+                .addClass('helios-arrow next')
+                .attr('data-dir', '-')
+                .on('click', function(e) {
+                    _.move(_, e);
+                });
+
+
+            // Append buttons to the selector
+            _.$slider.append(_.$prevArrow);
+            _.$slider.append(_.$nextArrow);
+        }
     }
 
     Helios.prototype.buildDots = function() {
         // all code that builds the dots
         var _ = this;
 
+        if(_.options.dots === true) {
+            // no something
+        }
     }
 
     Helios.prototype.deploy = function() {
         // all code that appends here.
         var _ = this;
 
-        if(_.arrows)
-            _.buildArrows();
+        _.buildArrows();
+        _.buildDots();
 
-        if(_.dots)
-            _.buildDots();
     }
 
     Helios.prototype.init = function() {
@@ -76,6 +117,7 @@
 
         console.log(_);
 
+        // Adds the default class for style purpose
         if (!$(_.$slider).hasClass('helios')) {
             $(_.$slider).addClass('helios');
         }
@@ -86,7 +128,6 @@
     $.fn.helios = function() {
         var _ = this;
         for (let i = 0; i < _.length; i++) {
-            console.log(_[i]);
             _[i].helios = new Helios(_[i], arguments[0]);
         }
         return _;
