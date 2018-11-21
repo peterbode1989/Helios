@@ -1,0 +1,20 @@
+.helios {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    > div[class^='col'] {
+        flex: 0 0 auto;
+        @include transition(.5s);
+
+        > div {
+            background-color: $gray;
+            height: 100%;
+        }
+    }
+}
