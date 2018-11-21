@@ -1,0 +1,13 @@
+{
+    "name": "peterbode1989/helios",
+    "description": "Helios is a lightweight Bootstrap gridslider",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Peter Bode",
+            "email": "peterbode1989@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
