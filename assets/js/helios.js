@@ -26,7 +26,7 @@
             var _ = this;
 
             _.defaults = {
-                step: 1, // the amount of cols to scroll when moving
+                step: 2, // the amount of cols to scroll when moving
                 gutter: 15, // the default space between cols
                 infinite: false,
 
@@ -44,22 +44,19 @@
             _.$slider = $(element);
             _.$children = $(element).children('div');
             _.$childSize = _.$children.outerWidth();
-            _.$currentIndex = 1;
+            _.$currentIndex = 0;
 
             _.init();
         }
         return Helios;
     }());
 
-    Helios.prototype.queue = function(dir) {
+    Helios.prototype.queue = function(cD) {
         var _ = this;
         _.$slider.queue(function() {
             _.$children.each(function() {
-                let cO = parseFloat($(this).css('left')),
-                    cD = (dir * _.$childSize);
-
                 $(this).animate({
-                    left: parseFloat(cD + cO),
+                    left: -parseFloat(cD),
                 }, 1000, function() {
                     _.$slider.dequeue();
                 });
@@ -72,7 +69,8 @@
 
         let dir = (_.options.step * -$(e.target).attr('data-dir'));
         _.$currentIndex -= dir;
-        _.queue(dir);
+
+        _.queue( _.$currentIndex * _.$childSize );
     }
 
     Helios.prototype.responsive = function() {
@@ -80,13 +78,7 @@
 
         _.$childSize = _.$children.outerWidth();
 
-        console.log(_.$childSize);
-        console.log(_.$currentIndex);
-
-        // let dir = (_.options.step * -$(e.target).attr('data-dir'));
-        // _.$currentIndex -= dir;
-        //
-        _.queue(_.$currentIndex);
+        _.queue( _.$currentIndex * _.$childSize );
     }
 
     Helios.prototype.buildArrows = function() {
