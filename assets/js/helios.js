@@ -51,12 +51,8 @@
         return Helios;
     }());
 
-    Helios.prototype.move = function(_, e) {
+    Helios.prototype.queue = function(dir) {
         var _ = this;
-
-        let dir = (_.options.step * -$(e.target).attr('data-dir'));
-        _.$currentIndex -= dir;
-
         _.$slider.queue(function() {
             _.$children.each(function() {
                 let cO = parseFloat($(this).css('left')),
@@ -69,6 +65,28 @@
                 });
             });
         });
+    }
+
+    Helios.prototype.move = function(_, e) {
+        var _ = this;
+
+        let dir = (_.options.step * -$(e.target).attr('data-dir'));
+        _.$currentIndex -= dir;
+        _.queue(dir);
+    }
+
+    Helios.prototype.responsive = function() {
+        var _ = this;
+
+        _.$childSize = _.$children.outerWidth();
+
+        console.log(_.$childSize);
+        console.log(_.$currentIndex);
+
+        // let dir = (_.options.step * -$(e.target).attr('data-dir'));
+        // _.$currentIndex -= dir;
+        //
+        _.queue(_.$currentIndex);
     }
 
     Helios.prototype.buildArrows = function() {
@@ -139,7 +157,7 @@
 
         clearTimeout(_.windowDelay);
         _.windowDelay = window.setTimeout(function() {
-            _.$childSize = _.$children.outerWidth();
+            _.responsive();
         }, 50);
     };
 
