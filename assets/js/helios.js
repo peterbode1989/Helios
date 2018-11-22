@@ -30,7 +30,7 @@
                 gutter: 15, // the default space between cols
                 infinite: false,
 
-                dots: false, // Boolean for showing/hiding the dots
+                dots: true, // Boolean for showing/hiding the dots
                 appendDots: null,
                 elDots: '<li></li>',
 
@@ -43,6 +43,8 @@
 
             _.$slider = $(element);
             _.$children = $(element).children('div');
+            _.$childrenCount = _.$children.length;
+            _.$dotCount = Math.ceil(_.$childrenCount / _.options.step);
             _.$childSize = _.$children.outerWidth();
             _.$currentIndex = 0;
 
@@ -114,6 +116,15 @@
 
         if(_.options.dots === true) {
             // do something
+            let ul = $('<ul></ul>');
+
+            for(var i = 0; i < _.$dotCount; i++) {
+                let li = _.options.elDots;
+
+                $(ul).append(li);
+            }
+
+            _.$slider.append(ul);
         }
     }
 
