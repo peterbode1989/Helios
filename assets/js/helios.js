@@ -113,7 +113,7 @@
         var _ = this;
 
         if(_.options.dots === true) {
-            // no something
+            // do something
         }
     }
 
