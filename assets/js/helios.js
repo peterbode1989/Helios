@@ -26,7 +26,7 @@
             var _ = this;
 
             _.defaults = {
-                step: 1, // the amount of cols to scroll when moving
+                step: 2, // the amount of cols to scroll when moving
                 gutter: 15, // the default space between cols
                 infinite: false,
 
@@ -43,8 +43,8 @@
 
             _.$slider = $(element);
             _.$children = $(element).children('div');
-            _.$childSize = $(element).children('div').outerWidth();
-            _.currentIndex = 0;
+            _.$childSize = _.$children.outerWidth();
+            _.currentIndex = 1;
 
             _.init();
         }
@@ -52,16 +52,20 @@
     }());
 
     Helios.prototype.move = function(_, e) {
+        var _ = this;
         let dir = $(e.target).attr('data-dir');
-        dir = (dir == '-' ? -_.$childSize : _.$childSize);
 
-        _.$children.each(function() {
-            let dist = parseInt($(this).css('left'));
+        _.$slider.queue(function() {
+            _.$children.each(function() {
+                let newPos = (_.options.step * -dir);
+                let dist = newPos * _.$childSize;
+                let left = parseInt($(this).css('left'));
 
-            $(this).animate({
-                left: parseInt(dist + dir),
-            }, 500, function() {
-                // Animation complete.
+                $(this).animate({
+                    left: parseInt(dist + left),
+                }, 1000, function() {
+                    _.$slider.dequeue();
+                });
             });
         });
     }
@@ -74,14 +78,14 @@
             // Apply default classes and events to elements
             _.$prevArrow = $(_.options.elPrevArrow)
                 .addClass('helios-arrow prev')
-                .attr('data-dir', '+')
+                .attr('data-dir', -1)
                 .on('click', function(e) {
                     _.move(_, e);
                 });
 
             _.$nextArrow = $(_.options.elNextArrow)
                 .addClass('helios-arrow next')
-                .attr('data-dir', '-')
+                .attr('data-dir', 1)
                 .on('click', function(e) {
                     _.move(_, e);
                 });
