@@ -127,7 +127,20 @@
             $(_.$slider).addClass('helios');
         }
 
+         $(window).on('resize', function() {
+             _.resize();
+         });
+
         _.deploy();
+    };
+
+    Helios.prototype.resize = function() {
+        var _ = this;
+
+        clearTimeout(_.windowDelay);
+        _.windowDelay = window.setTimeout(function() {
+            _.$childSize = _.$children.outerWidth();
+        }, 50);
     };
 
     $.fn.helios = function() {
