@@ -26,7 +26,7 @@
             var _ = this;
 
             _.defaults = {
-                step: 2, // the amount of cols to scroll when moving
+                step: 1, // the amount of cols to scroll when moving
                 gutter: 15, // the default space between cols
                 infinite: false,
 
@@ -44,7 +44,7 @@
             _.$slider = $(element);
             _.$children = $(element).children('div');
             _.$childSize = _.$children.outerWidth();
-            _.currentIndex = 1;
+            _.$currentIndex = 1;
 
             _.init();
         }
@@ -53,16 +53,17 @@
 
     Helios.prototype.move = function(_, e) {
         var _ = this;
-        let dir = $(e.target).attr('data-dir');
+
+        let dir = (_.options.step * -$(e.target).attr('data-dir'));
+        _.$currentIndex -= dir;
 
         _.$slider.queue(function() {
             _.$children.each(function() {
-                let newPos = (_.options.step * -dir);
-                let dist = newPos * _.$childSize;
-                let left = parseInt($(this).css('left'));
+                let cO = parseFloat($(this).css('left')),
+                    cD = (dir * _.$childSize);
 
                 $(this).animate({
-                    left: parseInt(dist + left),
+                    left: parseFloat(cD + cO),
                 }, 1000, function() {
                     _.$slider.dequeue();
                 });
@@ -77,14 +78,14 @@
         if(_.options.arrows === true) {
             // Apply default classes and events to elements
             _.$prevArrow = $(_.options.elPrevArrow)
-                .addClass('helios-arrow prev')
+                .addClass('helios-arrow helios-prev')
                 .attr('data-dir', -1)
                 .on('click', function(e) {
                     _.move(_, e);
                 });
 
             _.$nextArrow = $(_.options.elNextArrow)
-                .addClass('helios-arrow next')
+                .addClass('helios-arrow helios-next')
                 .attr('data-dir', 1)
                 .on('click', function(e) {
                     _.move(_, e);
