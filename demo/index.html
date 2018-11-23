@@ -10,22 +10,36 @@
 </head>
 <body>
 
-    <div class="container-fluid">
-        <div class="row helios">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+        </div>
+        <div class="row testElement">
             <div class="col-4">
-                <div>wasd</div>
+                <div><img class="img-fluid" src="https://via.placeholder.com/350x150?text=1"></div>
             </div>
             <div class="col-4">
-                <div>wasd</div>
+                <div><img class="img-fluid" src="https://via.placeholder.com/350x150?text=2"></div>
             </div>
             <div class="col-4">
-                <div>wasd<br><br>asd</div>
+                <div><img class="img-fluid" src="https://via.placeholder.com/350x150?text=3"></div>
             </div>
             <div class="col-4">
-                <div>wasd</div>
+                <div><img class="img-fluid" src="https://via.placeholder.com/350x150?text=4"></div>
             </div>
             <div class="col-4">
-                <div>wasd</div>
+                <div><img class="img-fluid" src="https://via.placeholder.com/350x150?text=5"></div>
+            </div>
+            <div class="col-4">
+                <div><img class="img-fluid" src="https://via.placeholder.com/350x150?text=6"></div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col rte">
+                <p>Suspendisse efficitur non mauris ac bibendum. Nulla sed justo fermentum, consectetur nunc dignissim, iaculis magna. Proin dictum tellus et dolor tristique dignissim. Pellentesque non ex eu leo volutpat consectetur. Curabitur sit amet purus justo. Fusce leo libero, ornare ut massa quis, ultrices hendrerit augue. Suspendisse molestie eros nisl, vel iaculis sapien cursus vitae. Integer ullamcorper sollicitudin ligula, eget varius lacus.</p>
             </div>
         </div>
     </div>
@@ -37,7 +51,8 @@
 
     <script>
         $(function() {
-            $('.helios').helios({
+            $('.testElement').helios({
+                arrows: true,
                 dots: true,
             });
         });
