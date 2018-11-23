@@ -28,6 +28,18 @@
             height: 20px;
             background: red;
             margin-right: 15px;
+            @include transition(.2s);
+
+            &:hover,
+            &.active {
+                background: blue;
+            }
+
+            > a {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
         }
     }
 }

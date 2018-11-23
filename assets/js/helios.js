@@ -31,8 +31,8 @@
                 infinite: false,
 
                 dots: true, // Boolean for showing/hiding the dots
-                appendDots: null,
-                elDots: '<li></li>',
+                appendDots: '<ul class="helios-dots"></ul>',
+                elDots: '<li><a href="#"></a></li>',
 
                 arrows: false, // Boolean for showing/hiding the arrows
                 appendArrows: $(element), // Element to appen
@@ -71,7 +71,7 @@
     Helios.prototype.move = function(_, e) {
         var _ = this;
 
-        _.$currentIndex -= $(e.target).attr('data-dir');
+        _.$currentIndex -= parseInt($(e.target).attr('data-dir'));
 
         _.queue( _.$currentIndex * _.$childSize );
     }
@@ -104,10 +104,13 @@
                     _.move(_, e);
                 });
 
+            _.options.elPrevArrow = _.$prevArrow;
+            _.options.elNextArrow = _.$nextArrow;
 
             // Append buttons to the selector
-            _.$slider.append(_.$prevArrow);
-            _.$slider.append(_.$nextArrow);
+
+            _.$slider.append(_.options.elPrevArrow);
+            _.$slider.append(_.options.elNextArrow);
         }
     }
 
@@ -117,20 +120,20 @@
 
         if(_.options.dots === true) {
             // do something
-            let ul = $('<ul class="helios-dots"></ul>');
+            let ul = $(_.options.appendDots);
 
             for(var i = 0; i < _.$dotCount; i++) {
                 let li = $(_.options.elDots)
-                    .text(i)
-                    .attr('data-dir', (i * _.options.step))
+                    .attr('data-step', (i * _.options.step))
                     .on('click', function(e) {
-                        let step = $(this).attr('data-step');
-                        _.$currentIndex = step;
-                        _.queue( step * _.$childSize );
+                        _.$currentIndex = parseInt($(this).attr('data-step'));
+                        _.responsive();
                     });
 
                 $(ul).append(li);
             }
+
+            _.options.appendDots = ul;
 
             _.$slider.append(ul);
         }
@@ -138,21 +141,20 @@
 
     Helios.prototype.update = function() {
         var _ = this;
-        console.log(_);
 
         if(_.$currentIndex == 0 && _.options.infinite === false) {
-            _.$prevArrow.attr('disabled', 'disabled');
+            _.options.elPrevArrow.attr('disabled', 'disabled');
         } else {
-            _.$prevArrow.removeAttr('disabled', 'disabled');
+            _.options.elPrevArrow.removeAttr('disabled', 'disabled');
         }
         if(_.$childrenCount == (_.$currentIndex + _.options.step) && _.options.infinite === false) {
-            _.$nextArrow.attr('disabled', 'disabled');
+            _.options.elNextArrow.attr('disabled', 'disabled');
         } else {
-            _.$nextArrow.removeAttr('disabled', 'disabled');
+            _.options.elNextArrow.removeAttr('disabled', 'disabled');
         }
 
         if(_.options.dots === true) {
-            $('.helios-dots').children('li').each(function(i) {
+            $(_.options.appendDots).children('li').each(function(i) {
                 $(this).removeClass('active');
                 if(_.$currentIndex == i) {
                     $(this).addClass('active');
