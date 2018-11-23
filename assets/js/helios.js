@@ -29,6 +29,7 @@
                 step: 1, // the amount of cols to scroll when moving
                 gutter: 15, // the default space between cols
                 infinite: false,
+                duration: 1000,
 
                 dots: true, // Boolean for showing/hiding the dots
                 appendDots: '<ul class="helios-dots"></ul>',
@@ -60,7 +61,7 @@
             _.$children.each(function() {
                 $(this).animate({
                     left: -parseFloat(cD),
-                }, 1000, function() {
+                }, _.options.duration, function() {
                     _.$slider.dequeue();
                 });
             });
@@ -79,7 +80,9 @@
     Helios.prototype.responsive = function() {
         var _ = this;
 
-        _.$childSize = _.$children.outerWidth();
+        if(_.$childSize !== _.$children.outerWidth()) {
+            _.$childSize = _.$children.outerWidth();
+        }
 
         _.queue( _.$currentIndex * _.$childSize );
     }
@@ -109,8 +112,8 @@
 
             // Append buttons to the selector
 
-            _.$slider.append(_.options.elPrevArrow);
-            _.$slider.append(_.options.elNextArrow);
+            $(_.options.appendArrows).append(_.options.elPrevArrow);
+            $(_.options.appendArrows).append(_.options.elNextArrow);
         }
     }
 
@@ -142,15 +145,17 @@
     Helios.prototype.update = function() {
         var _ = this;
 
-        if(_.$currentIndex == 0 && _.options.infinite === false) {
-            _.options.elPrevArrow.attr('disabled', 'disabled');
-        } else {
-            _.options.elPrevArrow.removeAttr('disabled', 'disabled');
-        }
-        if(_.$childrenCount == (_.$currentIndex + _.options.step) && _.options.infinite === false) {
-            _.options.elNextArrow.attr('disabled', 'disabled');
-        } else {
-            _.options.elNextArrow.removeAttr('disabled', 'disabled');
+        if(_.options.arrows === true) {
+            if(_.$currentIndex == 0 && _.options.infinite === false) {
+                _.options.elPrevArrow.attr('disabled', 'disabled');
+            } else {
+                _.options.elPrevArrow.removeAttr('disabled', 'disabled');
+            }
+            if(_.$childrenCount == (_.$currentIndex + _.options.step) && _.options.infinite === false) {
+                _.options.elNextArrow.attr('disabled', 'disabled');
+            } else {
+                _.options.elNextArrow.removeAttr('disabled', 'disabled');
+            }
         }
 
         if(_.options.dots === true) {
