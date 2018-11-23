@@ -87,6 +87,29 @@
         _.queue( _.$currentIndex * _.$childSize );
     }
 
+    Helios.prototype.buildInfinite = function() {
+        var _ = this;
+
+        if(_.options.infinite === false) return false;
+        
+        console.log('buildInfinite');
+
+        var collection = [];
+
+        _.$children.each(function() {
+            var temp = $(this).clone()
+                .addClass('helios-clone');
+            collection.push(temp);
+        });
+
+
+        _.$slider.append(collection);
+
+        console.log(collection);
+
+        _.$children = _.$slider.children('div');
+    }
+
     Helios.prototype.buildArrows = function() {
         // all code that builds the arrows
         var _ = this;
@@ -159,9 +182,9 @@
         }
 
         if(_.options.dots === true) {
-            $(_.options.appendDots).children('li').each(function(i) {
+            $(_.options.appendDots).children('li').each(function() {
                 $(this).removeClass('active');
-                if(_.$currentIndex == i) {
+                if(_.$currentIndex == parseInt($(this).attr('data-step'))) {
                     $(this).addClass('active');
                 }
             });
@@ -172,6 +195,7 @@
         // all code that appends here.
         var _ = this;
 
+        _.buildInfinite();
         _.buildArrows();
         _.buildDots();
 
@@ -181,8 +205,6 @@
     Helios.prototype.init = function() {
         // all code that needs to be executed before the rest starts.
         var _ = this;
-
-        console.log(_);
 
         // Adds the default class for style purpose
         if (!$(_.$slider).hasClass('helios')) {
