@@ -1,7 +1,7 @@
 .helios {
     position: relative;
-    display: flex;
-    flex-wrap: nowrap;
+    // display: flex;
+    // flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 30px;
@@ -11,7 +11,9 @@
     }
 
     > div[class^='col'] {
+        position: initial;
         flex: 0 0 auto;
+        z-index: 1;
 
         > div {
             background-color: $gray;

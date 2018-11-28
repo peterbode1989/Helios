@@ -27,16 +27,16 @@
 
             _.defaults = {
                 namespace: 'helios',
-                step: 1, // the amount of cols to scroll when moving
+                step: 2, // the amount of cols to scroll when moving
                 gutter: 15, // the default space between cols
-                infinite: false,
+                infinite: true,
                 duration: 1000,
 
                 dots: true, // Boolean for showing/hiding the dots
                 appendDots: $(element),
                 elDots: '<li><a href="#"></a></li>',
 
-                arrows: false, // Boolean for showing/hiding the arrows
+                arrows: true, // Boolean for showing/hiding the arrows
                 appendArrows: $(element), // Element to appen
                 elPrevArrow: '<button class="helios-arrow prev" aria-label="Previous" type="button">Previous</button>',
                 elNextArrow: '<button class="helios-arrow next" aria-label="Next" type="button">Next</button>',
@@ -58,18 +58,23 @@
         return Helios;
     }());
 
-    Helios.prototype.queue = function(cD) {
+    Helios.prototype.queue = function(cD, duration) {
         var _ = this;
+        duration = duration || _.options.duration;
 
         // if(_.options.infinite === true) {
         //     _.clone();
         // }
 
+
+
+
+
         _.$slider.queue(function() {
             _.$children.each(function() {
                 $(this).animate({
                     left: -parseFloat(cD),
-                }, _.options.duration, function() {
+                }, duration, function() {
                     _.$slider.dequeue();
                 });
             });
@@ -80,24 +85,30 @@
     Helios.prototype.move = function(_, e) {
         var _ = this;
 
-        _.$currentIndex -= parseInt($(e.target).attr('data-dir'));
+        let dir = parseInt($(e.target).attr('data-dir'));
+        _.$currentIndex -= dir;
 
-        let sol = (_.$currentIndex * _.$childSize) >= _.$sliderSize;
-        _.queue( (sol ? _.$sliderSize : _.$currentIndex * _.$childSize) );
+        // _.virtualscroll();
+        _.virtualscrolling(dir);
+
+        // this add max slide scrolling for last elements..
+        // let dynamic = (_.$currentIndex * _.$childSize); // temp slide maxer
+        // _.queue( (dynamic >= _.$sliderSize ? _.$sliderSize : dynamic) );
+
+        _.queue( (_.$currentIndex * _.$childSize) );
     }
 
-    Helios.prototype.responsive = function() {
+    Helios.prototype.responsive = function(duration) {
         var _ = this;
+        duration = duration || _.options.duration;
 
-        if(_.$childSize !== _.$children.outerWidth()) {
-            _.$childSize = _.$children.outerWidth();
-            _.$sliderSize = _.$slider.outerWidth();
+        _.update();
 
-            _.$colCount = Math.round(_.$sliderSize / _.$childSize);
-        }
+        // this add max slide scrolling for last elements..
+        // let sol = (_.$currentIndex * _.$childSize) >= _.$sliderSize;
+        // _.queue( (sol ? _.$sliderSize : _.$currentIndex * _.$childSize) );
 
-        let sol = (_.$currentIndex * _.$childSize) >= _.$sliderSize;
-        _.queue( (sol ? _.$sliderSize : _.$currentIndex * _.$childSize) );
+        _.queue( (_.$currentIndex * _.$childSize), duration );
     }
 
     Helios.prototype.buildInfinite = function() {
@@ -181,34 +192,57 @@
         }
     }
 
-    Helios.prototype.clone = function() {
+    Helios.prototype.virtualscroll = function() {
         var _ = this;
-        let i = _.$currentIndex * _.options.step;
 
 
+        // before i start cloning, do i meed these requirements?
+        console.log(_.$currentIndex);
+        console.log((_.$colCount + _.$currentIndex));
+        console.log(_.$children.length);
 
-        if((i+_.$colCount) >= _.$childrenCount) {
-            console.log(' moveplz');
-
-            _.$slider.append(_.$children.slice(0, _.options.step));
-
-            _.$slider.children('div[class^=\'col-\']').each(function() {
-                console.log($(this).css('left'));
-                $(this).css({'left' : $(this).css('left') - (_.options.step * _.$childSize)});
+        if((_.$colCount + _.$currentIndex) != _.$children.length
+            && _.$currentIndex != _.$children.length) {
+            _.$slider.append(_.$children.clone())
+        } else if(_.$currentIndex == _.$children.length) {
+            console.log('spcial?');
+            _.$currentIndex = 0;
+            _.$children.each(function() {
+                $(this).css('left', 0);
             });
         }
-        //     // console.log(_.$children.splice(_.$currentIndex, _.options.step));
-        //     _.$slider.append(_.$children.first());
-        //     // _.$currentIndex += -1;
-        //     _.$children = _.$slider.children('div');
-        //     console.log(_.$slider.children());
+
+        // let activeSlides = _.$children.filter(function(i) {
+        //     return (i >= _.$currentIndex && i < (_.$colCount + _.$currentIndex))
+        // });
+        //
+        // if(activeSlides.length != _.$colCount) {
+        //     // console.warn('virtualscroll');
+        //     // var toClone = _.$colCount - activeSlides.length;
+        //     // console.log(toClone);
+        //
+        //     // _.$children.each(function(i, el) {
+        //     //     console.log({i,el});
+        //     // });
+        //     _.$slider.append(_.$children.first().clone());
         // }
 
+        _.update();
 
     }
 
     Helios.prototype.update = function() {
         var _ = this;
+
+
+        if(_.$childSize !== _.$children.outerWidth()) {
+            _.$childSize = _.$children.outerWidth();
+            _.$sliderSize = _.$slider.outerWidth();
+
+            _.$colCount = Math.round(_.$sliderSize / _.$childSize);
+        }
+
+        _.$children = _.$slider.children('div[class^=\'col-\']'); // Update all the children (default fallback trigger)
 
         if(_.options.arrows === true) {
             if(_.$currentIndex == 0 && _.options.infinite === false) {
@@ -233,13 +267,48 @@
         }
     }
 
+    Helios.prototype.virtualscrolling = function(dir) {
+        dir = dir || 0;
+
+        var _ = this;
+
+
+
+
+
+
+        // dump all the assets needed
+        // let test = _.$children.filter(function(i) {
+        //     return (i >= _.$currentIndex && i < (_.$currentIndex + _.$colCount));
+        // });
+        // console.log(test);
+        //
+
+        // working example... beta-charlie everything.. bad
+        // if(dir !== 0 && test.length !== _.$colCount) {
+        //     let elms = _.$children.clone();
+        //
+        //     $(elms).each(function() {
+        //         $(this).addClass(_.options.namespace + '-clone');
+        //     });
+        //     _.$slider.append(elms);
+        //
+        //     _.update();
+        //
+        // }
+
+
+    }
+
     Helios.prototype.render = function() {
         // all code that appends here.
         var _ = this;
 
-        _.buildInfinite();
+        // _.buildInfinite();
         _.buildArrows();
         _.buildDots();
+
+        // _.virtualscrolling();
 
         _.update();
     }
