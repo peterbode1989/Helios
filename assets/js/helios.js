@@ -272,6 +272,38 @@
 
         var _ = this;
 
+        let newKeys = [];
+        for(var i = (_.$currentIndex - _.options.step); i < (_.$colCount + _.$currentIndex + _.options.step); i++ ) {
+            if(i < 0) {
+                newKeys.push((i + _.$childrenCount));
+            } else if(i >= _.$childrenCount) {
+                newKeys.push((i - _.$childrenCount));
+            } else {
+                newKeys.push(i);
+            }
+        }
+
+        let newOrder = newKeys.map(function(i){
+            return _.$children[i];
+        });
+
+        console.log(newOrder);
+
+        if( dir === 0) {
+        
+
+
+            //
+            _.$children.each(function() {
+                $(this).remove();
+            });
+            //
+            // console.log(newOrder);
+            //
+            _.$slider.append(newOrder);
+            _.$currentIndex += _.options.step;
+            _.responsive(1);
+        }
 
 
 
@@ -308,7 +340,7 @@
         _.buildArrows();
         _.buildDots();
 
-        // _.virtualscrolling();
+        _.virtualscrolling();
 
         _.update();
     }
