@@ -27,7 +27,7 @@
 
             _.defaults = {
                 namespace: 'helios',
-                step: 1, // the amount of cols to scroll when moving
+                step: 2, // the amount of cols to scroll when moving
                 gutter: 15, // the default space between cols
                 infinite: true,
                 duration: 1000,
@@ -47,11 +47,13 @@
             _.$slider = $(element);
             _.$sliderSize = _.$slider.outerWidth();
             _.$children = _.$slider.children('div[class^=\'col-\']');
+            _.$clonedChildren = _.$children.clone();
             _.$childrenCount = _.$children.length;
             _.$dotCount = Math.ceil(_.$childrenCount / _.options.step);
             _.$childSize = _.$children.outerWidth();
             _.$colCount = Math.round(_.$sliderSize / _.$childSize);
             _.$currentIndex = 0;
+            _.$currentOrder = Array.apply(null, Array(_.$childrenCount)).map(function (x, i) { return i });
 
             _.init();
         }
@@ -293,6 +295,70 @@
         dir = dir || 0;
 
         var _ = this;
+
+        // console.log(_.$clonedChildren);
+// console.log(_.options.step);
+        // let possibilities = new Array().map(function (x, i) { return i })
+        // console.log(_.$currentOrder); // returns the current load order; supplied by the user-dom
+
+
+
+        if(dir === 0) {
+
+            // let min =
+            // console.log(_.$clonedChildren);
+
+            if((_.$colCount + (_.options.step*2)) > _.$childrenCount) {
+                console.log('need double clone');
+            }
+
+            // console.log(
+            //     _.$currentOrder.slice(_.$currentIndex, _.$currentIndex + _.$colCount + _.options.step)
+            // );
+
+
+
+            // _.$currentOrder.map((el, index) => {
+            //   console.log("The current iteration is: " + index);
+            //   console.log("The current element is: " + el);
+            //   console.log("\n");
+            //   return 'X';
+            // });
+            _.$currentIndex=0;
+
+            console.log(
+                _.$currentOrder
+            );
+            let bleed = _.$currentOrder.splice(_.$currentIndex+_.$colCount+_.options.step, _.$currentOrder.length);
+
+
+            let order = bleed.concat(_.$currentOrder.splice(_.$currentIndex, _.$currentIndex+_.$colCount+_.options.step));
+            console.log(order);
+
+//
+//             if(
+//                 (_.$currentIndex - _.options.step) < 0
+//             ) {
+//                 order = _.$currentOrder.slice( (_.$currentIndex - _.options.step) ).concat(
+//                     order
+//                 );
+//                 console.log('concat :: ' + _.$currentOrder.slice( (_.$currentIndex - _.options.step) ));
+//             }
+//             console.log(order);
+
+
+            // _.$currentOrder = _.$currentOrder.splice(_.$childrenCount-_.options.step, _.$childrenCount).concat(
+            //     _.$currentOrder
+            // );
+            // console.log(_.$currentOrder);
+            // console.log('end init');
+
+        } else {
+            console.log(dir);
+            console.log(_.$childrenCount-_.options.step - _.options.step);
+            console.log( _.$childrenCount);
+            console.log(_.$currentIndex);
+        }
 
         // if(_.$currentIndex >= _.$childrenCount) {
         //     _.$currentIndex = _.$currentIndex - _.$childrenCount;
