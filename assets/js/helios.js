@@ -48,7 +48,6 @@
             _.$sliderSize = _.$slider.outerWidth();
             _.$children = _.$slider.children('div[class^=\'col-\']');
             _.$clonedChildren = _.$children.clone();
-            _.$renderedChildren = new Array();
             _.$childrenCount = _.$children.length;
             _.$childSize = _.$children.outerWidth();
             _.$dotCount = Math.ceil(_.$childrenCount / _.options.step);
@@ -246,14 +245,15 @@
     Helios.prototype.update = function() {
         var _ = this;
 
-        // if(_.$childSize !== _.$clonedChildren.outerWidth()) {
-            _.$childSize = _.$clonedChildren.outerWidth();
+
+
+        if(_.$childSize !== _.$clonedChildren.outerWidth()) {
+            _.$childSize = _.$children.outerWidth();
             _.$sliderSize = _.$slider.outerWidth();
 
             _.$colCount = Math.round(_.$sliderSize / _.$childSize);
-        // }
+        }
 
-        _.$children = _.$slider.children('div[class^=\'col-\']'); // Update all the children (default fallback trigger)
 
         if(_.options.arrows === true) {
             if(_.$currentIndex == 0 && _.options.infinite === false) {
@@ -305,20 +305,23 @@
           var i = i > this.length ? 0 : i;
           return [].concat(this.slice(i), this.slice(0, i));
         }
-        let order = _.$currentOrder.resort(_.$currentIndex-_.options.step);
-        order = order.slice(0, (_.$colCount + (_.options.step * 2)));
-        console.log(order);
+        _.$currentOrder = _.$currentOrder.resort(_.$currentIndex-_.options.step);
+        let order = _.$currentOrder.slice(0, (_.$colCount + (_.options.step * 2)));
 
         let children = order.map(function(i){
             $(_.$clonedChildren[i]).addClass(_.options.namespace + '-clone');
             return _.$clonedChildren[i];
         });
 
+
         _.$children.each(function() {
             $(this).remove();
         });
 
         _.$slider.prepend(children);
+
+
+        _.$children = _.$slider.children('div[class^=\'col-\']');
 
         if(dir === 0) {
             _.$currentIndex += _.options.step;
