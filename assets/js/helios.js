@@ -48,9 +48,10 @@
             _.$sliderSize = _.$slider.outerWidth();
             _.$children = _.$slider.children('div[class^=\'col-\']');
             _.$clonedChildren = _.$children.clone();
+            _.$renderedChildren = new Array();
             _.$childrenCount = _.$children.length;
-            _.$dotCount = Math.ceil(_.$childrenCount / _.options.step);
             _.$childSize = _.$children.outerWidth();
+            _.$dotCount = Math.ceil(_.$childrenCount / _.options.step);
             _.$colCount = Math.round(_.$sliderSize / _.$childSize);
             _.$currentIndex = 0;
             _.$currentOrder = Array.apply(null, Array(_.$childrenCount)).map(function (x, i) { return i });
@@ -103,7 +104,7 @@
         duration = duration || _.options.duration;
 
         _.update();
-
+        // console.log(_.$childSize);
         // this add max slide scrolling for last elements..
         // let sol = (_.$currentIndex * _.$childSize) >= _.$sliderSize;
         // _.queue( (sol ? _.$sliderSize : _.$currentIndex * _.$childSize) );
@@ -144,8 +145,6 @@
         if(_.$currentIndex >= _.$childrenCount) {
             _.$currentIndex += -(_.$childrenCount);
         }
-
-        console.log(_.$currentIndex);
     }
 
     Helios.prototype.buildArrows = function() {
@@ -247,13 +246,12 @@
     Helios.prototype.update = function() {
         var _ = this;
 
-
-        if(_.$childSize !== _.$children.outerWidth()) {
-            _.$childSize = _.$children.outerWidth();
+        // if(_.$childSize !== _.$clonedChildren.outerWidth()) {
+            _.$childSize = _.$clonedChildren.outerWidth();
             _.$sliderSize = _.$slider.outerWidth();
 
             _.$colCount = Math.round(_.$sliderSize / _.$childSize);
-        }
+        // }
 
         _.$children = _.$slider.children('div[class^=\'col-\']'); // Update all the children (default fallback trigger)
 
@@ -296,155 +294,59 @@
 
         var _ = this;
 
+        console.log(_.$currentOrder);
+
         // console.log(_.$clonedChildren);
 // console.log(_.options.step);
         // let possibilities = new Array().map(function (x, i) { return i })
         // console.log(_.$currentOrder); // returns the current load order; supplied by the user-dom
 
+        Array.prototype.resort = function(i){
+          var i = i > this.length ? 0 : i;
+          return [].concat(this.slice(i), this.slice(0, i));
+        }
+        let order = _.$currentOrder.resort(_.$currentIndex-_.options.step);
+        order = order.slice(0, (_.$colCount + (_.options.step * 2)));
+        console.log(order);
 
+        let children = order.map(function(i){
+            $(_.$clonedChildren[i]).addClass(_.options.namespace + '-clone');
+            return _.$clonedChildren[i];
+        });
+
+        _.$children.each(function() {
+            $(this).remove();
+        });
+
+        _.$slider.prepend(children);
+
+        if(dir === 0) {
+            _.$currentIndex += _.options.step;
+            _.responsive(1);
+        } else {
+            _.responsive();
+        }
+
+
+
+
+        // console.log(_.$slider.children());
 
         if(dir === 0) {
 
-            // let min =
-            // console.log(_.$clonedChildren);
-
-            if((_.$colCount + (_.options.step*2)) > _.$childrenCount) {
-                console.log('need double clone');
-            }
-
-            // console.log(
-            //     _.$currentOrder.slice(_.$currentIndex, _.$currentIndex + _.$colCount + _.options.step)
-            // );
 
 
-
-            // _.$currentOrder.map((el, index) => {
-            //   console.log("The current iteration is: " + index);
-            //   console.log("The current element is: " + el);
-            //   console.log("\n");
-            //   return 'X';
-            // });
-            _.$currentIndex=0;
-
-
-            Array.prototype.resort = function(i){
-              var i = i > this.length ? 0 : i;
-              return [].concat(this.slice(i), this.slice(0, i));
-            }
-
-            _.$currentOrder = _.$currentOrder.resort(_.$currentIndex-_.options.step);
-            for( var i = 0; i < (_.$colCount + (_.options.step * 2)); i++ ) {
-                if(_.$currentOrder[i] == _.$currentIndex) {
-                    console.log( _.$currentOrder[i] + ' active' );
-                } else {
-                    console.log( _.$currentOrder[i] );
-                }
-            }
-
-            // console.log(
-            //     _.$currentOrder
-            // );
-            // let bleed = _.$currentOrder.splice(_.$currentIndex+_.$colCount+_.options.step, _.$currentOrder.length);
-            //
-            //
-            // let order = bleed.concat(_.$currentOrder.splice(_.$currentIndex, _.$currentIndex+_.$colCount+_.options.step));
+            // for( var i = 0; i < (_.$colCount + (_.options.step * 2)); i++ ) {
+            //     console.log( order[i] );
+            // }
             // console.log(order);
 
-//
-//             if(
-//                 (_.$currentIndex - _.options.step) < 0
-//             ) {
-//                 order = _.$currentOrder.slice( (_.$currentIndex - _.options.step) ).concat(
-//                     order
-//                 );
-//                 console.log('concat :: ' + _.$currentOrder.slice( (_.$currentIndex - _.options.step) ));
-//             }
-//             console.log(order);
 
 
-            // _.$currentOrder = _.$currentOrder.splice(_.$childrenCount-_.options.step, _.$childrenCount).concat(
-            //     _.$currentOrder
-            // );
-            // console.log(_.$currentOrder);
-            // console.log('end init');
-
-        } else {
-            console.log(dir);
-            console.log(_.$childrenCount-_.options.step - _.options.step);
-            console.log( _.$childrenCount);
-            console.log(_.$currentIndex);
         }
 
-        // if(_.$currentIndex >= _.$childrenCount) {
-        //     _.$currentIndex = _.$currentIndex - _.$childrenCount;
-        // }
-        // console.log('i :: ' + _.$currentIndex);
-        //
-        // let newKeys = [];
-        // for(var i = (_.$currentIndex - _.options.step); i < (_.$currentIndex + _.options.step + _.$colCount); i++ ) {
-        //
-        //     if(i >= _.$childrenCount) {
-        //          newKeys.push((i - _.$childrenCount));
-        //         // console.log(i - _.$childrenCount);
-        //     } else if(i < 0) {
-        //         // console.log(i + _.$childrenCount);
-        //          newKeys.push((i + _.$childrenCount));
-        //     } else {
-        //         // console.log(i);
-        //          newKeys.push(i);
-        //     }
-        // }
-        // // for(var i = (_.$currentIndex - _.options.step); i < (_.$colCount + _.$currentIndex + _.options.step); i++ ) {
-        // //     if(i < 0) {
-        // //         newKeys.push((i + _.$childrenCount));
-        // //     } else if(i >= _.$childrenCount) {
-        // //         newKeys.push((i - _.$childrenCount));
-        // //     } else {
-        // //         newKeys.push(i);
-        // //     }
-        // // }
-        //
-        // // console.log(newKeys);
-        //
-        // let newOrder = newKeys.map(function(i){
-        //     return _.$children[i];
-        // });
-        //
-        // // console.log(newOrder);
-        //
-        // _.$children.each(function() {
-        //     $(this).remove();
-        // });
-        // //
-        // // console.log(newOrder);
-        // //
-        // _.$slider.append(newOrder);
-        // _.$currentIndex += _.options.step;
-        // // _.responsive(1);
 
 
-
-
-
-        // dump all the assets needed
-        // let test = _.$children.filter(function(i) {
-        //     return (i >= _.$currentIndex && i < (_.$currentIndex + _.$colCount));
-        // });
-        // console.log(test);
-        //
-
-        // working example... beta-charlie everything.. bad
-        // if(dir !== 0 && test.length !== _.$colCount) {
-        //     let elms = _.$children.clone();
-        //
-        //     $(elms).each(function() {
-        //         $(this).addClass(_.options.namespace + '-clone');
-        //     });
-        //     _.$slider.append(elms);
-        //
-        //     _.update();
-        //
-        // }
 
 
     }
