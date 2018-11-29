@@ -326,14 +326,29 @@
             // });
             _.$currentIndex=0;
 
-            console.log(
-                _.$currentOrder
-            );
-            let bleed = _.$currentOrder.splice(_.$currentIndex+_.$colCount+_.options.step, _.$currentOrder.length);
 
+            Array.prototype.resort = function(i){
+              var i = i > this.length ? 0 : i;
+              return [].concat(this.slice(i), this.slice(0, i));
+            }
 
-            let order = bleed.concat(_.$currentOrder.splice(_.$currentIndex, _.$currentIndex+_.$colCount+_.options.step));
-            console.log(order);
+            _.$currentOrder = _.$currentOrder.resort(_.$currentIndex-_.options.step);
+            for( var i = 0; i < (_.$colCount + (_.options.step * 2)); i++ ) {
+                if(_.$currentOrder[i] == _.$currentIndex) {
+                    console.log( _.$currentOrder[i] + ' active' );
+                } else {
+                    console.log( _.$currentOrder[i] );
+                }
+            }
+
+            // console.log(
+            //     _.$currentOrder
+            // );
+            // let bleed = _.$currentOrder.splice(_.$currentIndex+_.$colCount+_.options.step, _.$currentOrder.length);
+            //
+            //
+            // let order = bleed.concat(_.$currentOrder.splice(_.$currentIndex, _.$currentIndex+_.$colCount+_.options.step));
+            // console.log(order);
 
 //
 //             if(
