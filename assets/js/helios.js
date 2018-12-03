@@ -86,8 +86,6 @@
 
         _.updateIndex('move', dir);
 
-
-
         // this add max slide scrolling for last elements..
         // let dynamic = (_.$currentIndex * _.$childSize); // temp slide maxer
         // _.queue( (dynamic >= _.$sliderSize ? _.$sliderSize : dynamic) );
@@ -175,8 +173,6 @@
     Helios.prototype.update = function() {
         var _ = this;
 
-
-
         if(_.$childSize !== _.$clonedChildren.outerWidth()) {
             _.$childSize = _.$children.outerWidth();
             _.$sliderSize = _.$slider.outerWidth();
@@ -211,6 +207,7 @@
     }
 
     Helios.prototype.virtualscrolling = function() {
+        console.time('virtualscrolling');
         var _ = this;
 
         Array.prototype.resort = function(i){
@@ -219,10 +216,7 @@
         }
 
         _.$currentOrder = _.$startOrder.resort(_.$currentIndex-_.options.step);
-        console.log(_.$currentOrder);
         let order = _.$currentOrder.slice(0, (_.$colCount + (_.options.step * 2)));
-
-        console.log(order);
 
         _.$children.each(function() {
             if(!$(this).hasClass(_.options.namespace + '-clone')) _.$clonedChildren.push($(this).detach());
@@ -230,14 +224,14 @@
         });
 
         let children = order.map(function(i){
-            $(_.$clonedChildren[i]).addClass(_.options.namespace + '-clone');
-            // $(_.$clonedChildren[i]).css('left', -((_.$colCount * _.$childSize)*_.$currentIndex));
-            $(_.$clonedChildren[i]).css('left', _.$currentPos);
-            return _.$clonedChildren[i];
+            return $(_.$clonedChildren[i])
+                .addClass(_.options.namespace + '-clone')
+                .css('left', _.$currentPos);
         });
 
         _.$slider.prepend(children);
         _.$children = _.$slider.children('div[class^=\'col-\']');
+        console.timeEnd('virtualscrolling');
     }
 
     Helios.prototype.render = function() {
@@ -247,8 +241,6 @@
         // _.buildInfinite();
         _.buildArrows();
         _.buildDots();
-
-        _.virtualscrolling();
 
         _.update();
     }
