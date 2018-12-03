@@ -53,6 +53,7 @@
             _.$dotCount = Math.ceil(_.$childrenCount / _.options.step);
             _.$colCount = Math.round(_.$sliderSize / _.$childSize);
             _.$currentIndex = 0;
+            _.$offset = (_.$childSize * _.options.step);
             _.$currentPos = _.$currentIndex * _.options.step - (_.$childSize * _.options.step);
             _.$startOrder = Array.apply(null, Array(_.$childrenCount)).map(function (x, i) { return i });
             _.$currentOrder = _.$startOrder;
@@ -74,6 +75,11 @@
                     _.$slider.dequeue();
                 });
             });
+
+        });
+
+        _.$slider.queue(function() {
+            // queue callback workaround..
             _.$currentPos = -parseFloat(cD);
             _.update();
         });
@@ -85,16 +91,21 @@
         switch (event.data.message) {
             case 'previous':
                 _.$currentIndex -= _.options.step;
-                _.queue( (_.$currentIndex * _.$childSize) );
+                _.queue( _.$offset + (_.$currentIndex * _.$childSize) );
                 break;
 
             case 'next':
                 _.$currentIndex += _.options.step;
-                _.queue( (_.$currentIndex * _.$childSize) );
+                _.queue( _.$offset + (_.$currentIndex * _.$childSize) );
                 break;
 
             case 'index':
-                console.log('index');
+                _.$currentIndex = event.data.val;
+                _.queue( _.$offset + (_.$currentIndex * _.$childSize) );
+                break;
+
+            case 'resize':
+                _.queue( _.$offset + (_.$currentIndex * _.$childSize), event.data.duration );
                 break;
 
             default:
@@ -123,34 +134,34 @@
         });
     }
 
-    Helios.prototype.index = function() {
+    Helios.prototype.index = function(value) {
         var _ = this;
 
         _.changeSlide({
             data: {
-                message: 'index'
+                message: 'index',
+                val: value,
             }
         });
     }
 
-    Helios.prototype.responsive = function(duration) {
-        var _ = this;
-        duration = duration || _.options.duration;
-
-
-        _.queue( (_.$currentIndex * _.$childSize), duration );
-        _.update();
-    }
-
-    Helios.prototype.updateIndex = function(type, dir) {
+    Helios.prototype.resize = function() {
         var _ = this;
 
-        if(type === 'move') _.$currentIndex -= dir;
-        if(type === 'equal') _.$currentIndex = dir;
+        clearTimeout(_.windowDelay);
+        _.windowDelay = window.setTimeout(function() {
 
-        if(_.$currentIndex >= _.$childrenCount) {
-            _.$currentIndex += -(_.$childrenCount);
-        }
+            _.changeSlide({
+                data: {
+                    message: 'resize',
+                    duration: _.options.duration,
+                }
+            });
+
+            // Re-init all values after resize-event is resolved
+            _.update();
+
+        }, 50);
     }
 
     Helios.prototype.buildArrows = function() {
@@ -162,16 +173,14 @@
             _.$prevArrow = $(_.options.elPrevArrow)
                 .addClass(_.options.namespace+'-arrow')
                 .addClass(_.options.namespace+'-prev')
-                .on('click', function(e) {
-                    // _.move(_, e);
+                .on('click', function() {
                     _.previous();
                 });
 
             _.$nextArrow = $(_.options.elNextArrow)
                 .addClass(_.options.namespace+'-arrow')
                 .addClass(_.options.namespace+'-next')
-                .on('click', function(e) {
-                    // _.move(_, e);
+                .on('click', function() {
                     _.next();
                 });
 
@@ -198,8 +207,7 @@
                 let li = $(_.options.elDots)
                     .attr('data-step', (i * _.options.step))
                     .on('click', function(e) {
-                        _.updateIndex('equal', parseInt($(this).attr('data-step')));
-                        _.responsive();
+                        _.index( parseInt($(this).attr('data-step')) );
                     });
 
                 $(ul).append(li);
@@ -219,6 +227,8 @@
 
             _.$colCount = Math.round(_.$sliderSize / _.$childSize);
 
+            _.virtualscrolling();
+        } else {
             _.virtualscrolling();
         }
 
@@ -247,7 +257,7 @@
     }
 
     Helios.prototype.virtualscrolling = function() {
-        console.time('virtualscrolling');
+
         var _ = this;
 
         Array.prototype.resort = function(i){
@@ -271,7 +281,6 @@
 
         _.$slider.prepend(children);
         _.$children = _.$slider.children('div[class^=\'col-\']');
-        console.timeEnd('virtualscrolling');
     }
 
     Helios.prototype.render = function() {
@@ -290,24 +299,14 @@
         var _ = this;
 
         // Adds the default class for style purpose
-        if (!$(_.$slider).hasClass('helios')) {
+        if (!$(_.$slider).hasClass('helios'))
             $(_.$slider).addClass('helios');
-        }
 
          $(window).on('resize', function() {
              _.resize();
          });
 
         _.render();
-    };
-
-    Helios.prototype.resize = function() {
-        var _ = this;
-
-        clearTimeout(_.windowDelay);
-        _.windowDelay = window.setTimeout(function() {
-            _.responsive();
-        }, 50);
     };
 
     $.fn.helios = function() {
