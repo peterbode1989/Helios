@@ -53,7 +53,7 @@
             _.$dotCount = Math.ceil(_.$childrenCount / _.options.step);
             _.$colCount = Math.round(_.$sliderSize / _.$childSize);
             _.$currentIndex = 0;
-            _.$currentPos = _.$currentIndex * _.options.step;
+            _.$currentPos = _.$currentIndex * _.options.step - (_.$childSize * _.options.step);
             _.$startOrder = Array.apply(null, Array(_.$childrenCount)).map(function (x, i) { return i });
             _.$currentOrder = _.$startOrder;
 
@@ -79,18 +79,58 @@
         });
     }
 
-    Helios.prototype.move = function(_, e) {
+    Helios.prototype.changeSlide = function(event) {
         var _ = this;
 
-        let dir = parseInt($(e.target).attr('data-dir'));
+        switch (event.data.message) {
+            case 'previous':
+                _.$currentIndex -= _.options.step;
+                _.queue( (_.$currentIndex * _.$childSize) );
+                break;
 
-        _.updateIndex('move', dir);
+            case 'next':
+                _.$currentIndex += _.options.step;
+                _.queue( (_.$currentIndex * _.$childSize) );
+                break;
 
-        // this add max slide scrolling for last elements..
-        // let dynamic = (_.$currentIndex * _.$childSize); // temp slide maxer
-        // _.queue( (dynamic >= _.$sliderSize ? _.$sliderSize : dynamic) );
+            case 'index':
+                console.log('index');
+                break;
 
-        _.queue( (_.$currentIndex * _.$childSize) );
+            default:
+                return;
+        }
+
+    };
+
+    Helios.prototype.next = function() {
+        var _ = this;
+
+        _.changeSlide({
+            data: {
+                message: 'next'
+            }
+        });
+    }
+
+    Helios.prototype.previous = function() {
+        var _ = this;
+
+        _.changeSlide({
+            data: {
+                message: 'previous'
+            }
+        });
+    }
+
+    Helios.prototype.index = function() {
+        var _ = this;
+
+        _.changeSlide({
+            data: {
+                message: 'index'
+            }
+        });
     }
 
     Helios.prototype.responsive = function(duration) {
@@ -122,17 +162,17 @@
             _.$prevArrow = $(_.options.elPrevArrow)
                 .addClass(_.options.namespace+'-arrow')
                 .addClass(_.options.namespace+'-prev')
-                .attr('data-dir', _.options.step * 1)
                 .on('click', function(e) {
-                    _.move(_, e);
+                    // _.move(_, e);
+                    _.previous();
                 });
 
             _.$nextArrow = $(_.options.elNextArrow)
                 .addClass(_.options.namespace+'-arrow')
                 .addClass(_.options.namespace+'-next')
-                .attr('data-dir', _.options.step * -1)
                 .on('click', function(e) {
-                    _.move(_, e);
+                    // _.move(_, e);
+                    _.next();
                 });
 
             _.options.elPrevArrow = _.$prevArrow;
@@ -178,6 +218,8 @@
             _.$sliderSize = _.$slider.outerWidth();
 
             _.$colCount = Math.round(_.$sliderSize / _.$childSize);
+
+            _.virtualscrolling();
         }
 
 
@@ -202,8 +244,6 @@
                 }
             });
         }
-
-        _.virtualscrolling();
     }
 
     Helios.prototype.virtualscrolling = function() {
