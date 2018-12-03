@@ -53,7 +53,9 @@
             _.$dotCount = Math.ceil(_.$childrenCount / _.options.step);
             _.$colCount = Math.round(_.$sliderSize / _.$childSize);
             _.$currentIndex = 0;
-            _.$currentOrder = Array.apply(null, Array(_.$childrenCount)).map(function (x, i) { return i });
+            _.$currentPos = _.$currentIndex * _.options.step;
+            _.$startOrder = Array.apply(null, Array(_.$childrenCount)).map(function (x, i) { return i });
+            _.$currentOrder = _.$startOrder;
 
             _.init();
         }
@@ -76,6 +78,7 @@
                     _.$slider.dequeue();
                 });
             });
+            _.$currentPos = -parseFloat(cD);
             _.update();
         });
     }
@@ -294,29 +297,40 @@
 
         var _ = this;
 
-        console.log(_.$currentOrder);
+        // console.log(_.$currentOrder);
 
         // console.log(_.$clonedChildren);
 // console.log(_.options.step);
         // let possibilities = new Array().map(function (x, i) { return i })
         // console.log(_.$currentOrder); // returns the current load order; supplied by the user-dom
-
+// console.log(_.$currentOrder);
+// console.log(_.$currentIndex-_.options.step);
+// console.log(_.$currentIndex);
+// console.log(_.options.step);
         Array.prototype.resort = function(i){
           var i = i > this.length ? 0 : i;
           return [].concat(this.slice(i), this.slice(0, i));
         }
-        _.$currentOrder = _.$currentOrder.resort(_.$currentIndex-_.options.step);
+        console.log(_.$currentIndex-_.options.step);
+        _.$currentOrder = _.$startOrder.resort(_.$currentIndex-_.options.step);
+        console.log(_.$currentOrder);
         let order = _.$currentOrder.slice(0, (_.$colCount + (_.options.step * 2)));
+
+        console.log(order);
+
+        _.$children.each(function() {
+            if(!$(this).hasClass(_.options.namespace + '-clone')) _.$clonedChildren.push($(this).detach());
+            else $(this).detach();
+        });
 
         let children = order.map(function(i){
             $(_.$clonedChildren[i]).addClass(_.options.namespace + '-clone');
+            // $(_.$clonedChildren[i]).css('left', -((_.$colCount * _.$childSize)*_.$currentIndex));
+            $(_.$clonedChildren[i]).css('left', _.$currentPos);
             return _.$clonedChildren[i];
         });
 
 
-        _.$children.each(function() {
-            $(this).remove();
-        });
 
         _.$slider.prepend(children);
 
@@ -324,10 +338,11 @@
         _.$children = _.$slider.children('div[class^=\'col-\']');
 
         if(dir === 0) {
-            _.$currentIndex += _.options.step;
-            _.responsive(1);
+            // console.log(_.$childSize);
+            // _.$currentIndex += _.options.step;
+            // _.responsive(1);
         } else {
-            _.responsive();
+            // _.responsive();
         }
 
 
