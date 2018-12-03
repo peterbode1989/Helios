@@ -66,10 +66,6 @@
         var _ = this;
         duration = duration || _.options.duration;
 
-        // if(_.options.infinite === true) {
-        //     _.clone();
-        // }
-
         _.$slider.queue(function() {
             _.$children.each(function() {
                 $(this).animate({
@@ -91,8 +87,6 @@
         _.updateIndex('move', dir);
 
 
-        // _.virtualscroll();
-        _.virtualscrolling(dir);
 
         // this add max slide scrolling for last elements..
         // let dynamic = (_.$currentIndex * _.$childSize); // temp slide maxer
@@ -105,38 +99,10 @@
         var _ = this;
         duration = duration || _.options.duration;
 
-        _.update();
-        // console.log(_.$childSize);
-        // this add max slide scrolling for last elements..
-        // let sol = (_.$currentIndex * _.$childSize) >= _.$sliderSize;
-        // _.queue( (sol ? _.$sliderSize : _.$currentIndex * _.$childSize) );
 
         _.queue( (_.$currentIndex * _.$childSize), duration );
+        _.update();
     }
-
-    // Helios.prototype.buildInfinite = function() {
-    //     var _ = this;
-    //
-    //     if(_.options.infinite === false) return false;
-    //
-    //     //
-    //     // console.log('buildInfinite');
-    //     //
-    //     // var collection = [];
-    //     //
-    //     // _.$children.each(function() {
-    //     //     var temp = $(this).clone()
-    //     //         .addClass('helios-clone');
-    //     //     collection.push(temp);
-    //     // });
-    //     //
-    //     //
-    //     // _.$slider.append(collection);
-    //     //
-    //     // console.log(collection);
-    //     //
-    //     // _.$children = _.$slider.children('div');
-    // }
 
     Helios.prototype.updateIndex = function(type, dir) {
         var _ = this;
@@ -206,45 +172,6 @@
         }
     }
 
-    // Helios.prototype.virtualscroll = function() {
-    //     var _ = this;
-    //
-    //
-    //     // before i start cloning, do i meed these requirements?
-    //     console.log(_.$currentIndex);
-    //     console.log((_.$colCount + _.$currentIndex));
-    //     console.log(_.$children.length);
-    //
-    //     if((_.$colCount + _.$currentIndex) != _.$children.length
-    //         && _.$currentIndex != _.$children.length) {
-    //         _.$slider.append(_.$children.clone())
-    //     } else if(_.$currentIndex == _.$children.length) {
-    //         console.log('spcial?');
-    //         _.$currentIndex = 0;
-    //         _.$children.each(function() {
-    //             $(this).css('left', 0);
-    //         });
-    //     }
-    //
-    //     // let activeSlides = _.$children.filter(function(i) {
-    //     //     return (i >= _.$currentIndex && i < (_.$colCount + _.$currentIndex))
-    //     // });
-    //     //
-    //     // if(activeSlides.length != _.$colCount) {
-    //     //     // console.warn('virtualscroll');
-    //     //     // var toClone = _.$colCount - activeSlides.length;
-    //     //     // console.log(toClone);
-    //     //
-    //     //     // _.$children.each(function(i, el) {
-    //     //     //     console.log({i,el});
-    //     //     // });
-    //     //     _.$slider.append(_.$children.first().clone());
-    //     // }
-    //
-    //     _.update();
-    //
-    // }
-
     Helios.prototype.update = function() {
         var _ = this;
 
@@ -279,39 +206,18 @@
                 }
             });
         }
+
+        _.virtualscrolling();
     }
 
-    Helios.prototype.reorder = function() {
-        // function for all reordering of the DOM...
-
-        // All elements can be found here _.$children
-        // New order of dom Elements
-
-        // Add them to the current dom
-
-        // Update all Helios-data to be certain!
-    }
-
-    Helios.prototype.virtualscrolling = function(dir) {
-        dir = dir || 0;
-
+    Helios.prototype.virtualscrolling = function() {
         var _ = this;
 
-        // console.log(_.$currentOrder);
-
-        // console.log(_.$clonedChildren);
-// console.log(_.options.step);
-        // let possibilities = new Array().map(function (x, i) { return i })
-        // console.log(_.$currentOrder); // returns the current load order; supplied by the user-dom
-// console.log(_.$currentOrder);
-// console.log(_.$currentIndex-_.options.step);
-// console.log(_.$currentIndex);
-// console.log(_.options.step);
         Array.prototype.resort = function(i){
           var i = i > this.length ? 0 : i;
           return [].concat(this.slice(i), this.slice(0, i));
         }
-        console.log(_.$currentIndex-_.options.step);
+
         _.$currentOrder = _.$startOrder.resort(_.$currentIndex-_.options.step);
         console.log(_.$currentOrder);
         let order = _.$currentOrder.slice(0, (_.$colCount + (_.options.step * 2)));
@@ -330,43 +236,8 @@
             return _.$clonedChildren[i];
         });
 
-
-
         _.$slider.prepend(children);
-
-
         _.$children = _.$slider.children('div[class^=\'col-\']');
-
-        if(dir === 0) {
-            // console.log(_.$childSize);
-            // _.$currentIndex += _.options.step;
-            // _.responsive(1);
-        } else {
-            // _.responsive();
-        }
-
-
-
-
-        // console.log(_.$slider.children());
-
-        if(dir === 0) {
-
-
-
-            // for( var i = 0; i < (_.$colCount + (_.options.step * 2)); i++ ) {
-            //     console.log( order[i] );
-            // }
-            // console.log(order);
-
-
-
-        }
-
-
-
-
-
     }
 
     Helios.prototype.render = function() {
