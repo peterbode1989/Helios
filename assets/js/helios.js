@@ -81,6 +81,7 @@
         _.$slider.queue(function() {
             // queue callback workaround..
             _.$currentPos = -parseFloat(cD);
+
             _.update();
         });
     }
@@ -226,12 +227,9 @@
             _.$sliderSize = _.$slider.outerWidth();
 
             _.$colCount = Math.round(_.$sliderSize / _.$childSize);
-
-            _.virtualscrolling();
-        } else {
-            _.virtualscrolling();
         }
 
+        _.virtualscrolling();
 
         if(_.options.arrows === true) {
             if(_.$currentIndex == 0 && _.options.infinite === false) {
@@ -257,7 +255,6 @@
     }
 
     Helios.prototype.virtualscrolling = function() {
-
         var _ = this;
 
         Array.prototype.resort = function(i){
@@ -269,8 +266,10 @@
         let order = _.$currentOrder.slice(0, (_.$colCount + (_.options.step * 2)));
 
         _.$children.each(function() {
-            if(!$(this).hasClass(_.options.namespace + '-clone')) _.$clonedChildren.push($(this).detach());
-            else $(this).detach();
+            if(!$(this).hasClass(_.options.namespace + '-clone'))
+                _.$clonedChildren.push($(this).detach());
+            else
+                $(this).detach();
         });
 
         let children = order.map(function(i){
@@ -280,11 +279,19 @@
         });
 
         _.$slider.prepend(children);
+
         _.$children = _.$slider.children('div[class^=\'col-\']');
+
+        _.$children.each(function() {
+            $(this).css('left', -_.$offset);
+        });
+
+        // _.$children.each(function() {
+        //     $(this).css('left', _.$offset)
+        // });
     }
 
     Helios.prototype.render = function() {
-        // all code that appends here.
         var _ = this;
 
         // _.buildInfinite();
@@ -295,7 +302,6 @@
     }
 
     Helios.prototype.init = function() {
-        // all code that needs to be executed before the rest starts.
         var _ = this;
 
         // Adds the default class for style purpose
