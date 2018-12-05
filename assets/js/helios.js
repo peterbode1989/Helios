@@ -47,14 +47,18 @@
             _.$slider = $(element);
             _.$sliderSize = _.$slider.outerWidth();
             _.$children = _.$slider.children('div[class^=\'col-\']');
-            _.$clonedChildren = _.$children.clone();
+            _.$clonedChildren = [];
+            console.log(_.$clonedChildren);
             _.$childrenCount = _.$children.length;
             _.$childSize = _.$children.outerWidth();
             _.$dotCount = Math.ceil(_.$childrenCount / _.options.step);
             _.$colCount = Math.round(_.$sliderSize / _.$childSize);
             _.$currentIndex = 0;
             _.$offset = (_.$childSize * _.options.step);
+
             _.$currentPos = _.$currentIndex * _.options.step - (_.$childSize * _.options.step);
+            _.$basePos = _.$currentPos;
+
             _.$startOrder = Array.apply(null, Array(_.$childrenCount)).map(function (x, i) { return i });
             _.$currentOrder = _.$startOrder;
 
@@ -63,14 +67,14 @@
         return Helios;
     }());
 
-    Helios.prototype.queue = function(cD, duration) {
+    Helios.prototype.queue = function(duration) {
         var _ = this;
         duration = duration || _.options.duration;
 
         _.$slider.queue(function() {
             _.$children.each(function() {
                 $(this).animate({
-                    left: -parseFloat(cD),
+                    left: -parseFloat(_.$offset + (_.$currentIndex * _.$childSize)),
                 }, duration, function() {
                     _.$slider.dequeue();
                 });
@@ -80,7 +84,9 @@
 
         _.$slider.queue(function() {
             // queue callback workaround..
-            _.$currentPos = -parseFloat(cD);
+            _.$currentPos = -parseFloat(_.$offset + (_.$currentIndex * _.$childSize));
+
+            _.virtualscrolling(_.$offset + (_.$currentIndex * _.$childSize));
 
             _.update();
         });
@@ -89,24 +95,35 @@
     Helios.prototype.changeSlide = function(event) {
         var _ = this;
 
+        var operators = {
+            'previous': function() { return _.$currentIndex -= _.options.step },
+            'next': function() { return _.$currentIndex += _.options.step },
+            'index': function() { return event.data.val },
+            'resize': function() { return _.$currentIndex },
+        };
+
+
+        // console.warn(
+        _.$currentIndex = operators[event.data.message]();
+        console.log(_.$currentIndex);
+        // );
+
+
         switch (event.data.message) {
             case 'previous':
-                _.$currentIndex -= _.options.step;
-                _.queue( _.$offset + (_.$currentIndex * _.$childSize) );
+                _.queue();
                 break;
 
             case 'next':
-                _.$currentIndex += _.options.step;
-                _.queue( _.$offset + (_.$currentIndex * _.$childSize) );
+                _.queue();
                 break;
 
             case 'index':
-                _.$currentIndex = event.data.val;
-                _.queue( _.$offset + (_.$currentIndex * _.$childSize) );
+                _.queue();
                 break;
 
             case 'resize':
-                _.queue( _.$offset + (_.$currentIndex * _.$childSize), event.data.duration );
+                _.queue( event.data.duration );
                 break;
 
             default:
@@ -120,7 +137,7 @@
 
         _.changeSlide({
             data: {
-                message: 'next'
+                message: 'next',
             }
         });
     }
@@ -130,7 +147,7 @@
 
         _.changeSlide({
             data: {
-                message: 'previous'
+                message: 'previous',
             }
         });
     }
@@ -221,15 +238,12 @@
 
     Helios.prototype.update = function() {
         var _ = this;
-
-        if(_.$childSize !== _.$clonedChildren.outerWidth()) {
-            _.$childSize = _.$children.outerWidth();
-            _.$sliderSize = _.$slider.outerWidth();
-
-            _.$colCount = Math.round(_.$sliderSize / _.$childSize);
-        }
-
-        _.virtualscrolling();
+        // if(_.$childSize !== $(_.$clonedChildren).first().outerWidth()) {
+        //     _.$childSize = _.$children.outerWidth();
+        //     _.$sliderSize = _.$slider.outerWidth();
+        //
+        //     _.$colCount = Math.round(_.$sliderSize / _.$childSize);
+        // }
 
         if(_.options.arrows === true) {
             if(_.$currentIndex == 0 && _.options.infinite === false) {
@@ -254,8 +268,12 @@
         }
     }
 
-    Helios.prototype.virtualscrolling = function() {
+    Helios.prototype.virtualscrolling = function(cD) {
         var _ = this;
+
+        cD = cD || 0;
+
+        console.log(_.$currentIndex);
 
         Array.prototype.resort = function(i){
           var i = i > this.length ? 0 : i;
@@ -265,36 +283,35 @@
         _.$currentOrder = _.$startOrder.resort(_.$currentIndex-_.options.step);
         let order = _.$currentOrder.slice(0, (_.$colCount + (_.options.step * 2)));
 
+        console.log(order);
+
         _.$children.each(function() {
             if(!$(this).hasClass(_.options.namespace + '-clone'))
                 _.$clonedChildren.push($(this).detach());
             else
                 $(this).detach();
         });
-
+        //
         let children = order.map(function(i){
             return $(_.$clonedChildren[i])
-                .addClass(_.options.namespace + '-clone')
-                .css('left', _.$currentPos);
+                .addClass(_.options.namespace + '-clone');
         });
+        //
 
         _.$slider.prepend(children);
 
         _.$children = _.$slider.children('div[class^=\'col-\']');
 
         _.$children.each(function() {
-            $(this).css('left', -_.$offset);
+            $(this).css('left', _.$currentPos);
         });
-
-        // _.$children.each(function() {
-        //     $(this).css('left', _.$offset)
-        // });
     }
 
     Helios.prototype.render = function() {
         var _ = this;
 
         // _.buildInfinite();
+        _.virtualscrolling();
         _.buildArrows();
         _.buildDots();
 
