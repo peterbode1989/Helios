@@ -110,23 +110,24 @@
 
 
         switch (event.data.message) {
-            case 'previous':
-                _.queue();
-                break;
-
-            case 'next':
-                _.queue();
-                break;
-
-            case 'index':
-                _.queue();
-                break;
+            // case 'previous':
+            //     _.queue();
+            //     break;
+            //
+            // case 'next':
+            //     _.queue();
+            //     break;
+            //
+            // case 'index':
+            //     _.queue();
+            //     break;
 
             case 'resize':
                 _.queue( event.data.duration );
                 break;
 
             default:
+                _.queue();
                 return;
         }
 
